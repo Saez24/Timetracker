@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Einfache Zeiterfassung</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body onload="initApp()">
+  <div class="date-picker">
+    <h1>Einfache Zeiterfassung</h1>
+    <input type="date" id="dateSelector" value="">
+  </div>
+  <div class="controls">
+    <button id="showHistoryBtn" class="history-toggle large-text">Historische Daten anzeigen</button>
+
+    <button id="contrastBtn" class="large-text">Kontrast umschalten</button>
+  </div>
+
+
+  <div class="controls">
+    <button id="workBtn" class="large-text">Arbeit starten</button>
+    <button id="pauseBtn" class="large-text" disabled>Pause starten</button>
+  </div>
+
+  <div class="log" id="timeLog"></div>
+
+  <script>
+
+  </script>
+</body>
+<script src="./scripts/database.js"></script>
+<script src="./scripts/kontrast.js"></script>
+<script src="./scripts/main.js"></script>
+<script src="./scripts/history.js"></script>
+<script src="./scripts/download.js"></script>
+
+</html>

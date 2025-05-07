@@ -1,0 +1,272 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    /* box-sizing: border-box;
+    position: relative;
+    padding-bottom: 80px;
+    overflow-y: hidden; */
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin: 0;
+}
+
+h2 {
+    color: #34495e;
+    text-align: center;
+    text-decoration-line: underline;
+    text-decoration-color: #3498db;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+
+
+button {
+    padding: 15px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+    transition: all 0.3s;
+    min-width: 120px;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button:active,
+button.active {
+    background-color: #2ecc71;
+}
+
+button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.log {
+    background-color: white;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 20px;
+    overflow-y: auto;
+}
+
+.log-entry {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.log-summary {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.summary-table th,
+.summary-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.summary-table th {
+    background-color: #3498db;
+    color: white;
+}
+
+.download-btn {
+    background-color: #27ae60;
+
+    width: 100%;
+    /* position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%); */
+    max-width: 800px;
+    box-sizing: border-box;
+}
+
+.download-btn:hover {
+    background-color: #219653;
+}
+
+.large-text {
+    font-size: 24px;
+}
+
+.high-contrast {
+    background-color: black;
+    color: white;
+}
+
+.high-contrast h1,
+.high-contrast h2 {
+    color: #ffffff;
+    text-decoration-color: #ffffff;
+}
+
+.high-contrast button {
+    background-color: yellow;
+    color: black;
+}
+
+.high-contrast .history-log-summary {
+    background-color: #444 !important;
+}
+
+.high-contrast .detailed-log {
+    background-color: #444 !important;
+}
+
+.high-contrast .log {
+    background-color: #333;
+    color: white;
+}
+
+.high-contrast .log-summary {
+    background-color: #555 !important;
+}
+
+.high-contrast .summary-table th {
+    background-color: #ff0;
+    color: #000;
+}
+
+.summary-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.summary-box {
+    background-color: #e8f4fc;
+    padding: 10px 15px;
+    border-radius: 5px;
+    flex: 1;
+    margin: 0 5px;
+    text-align: center;
+}
+
+.summary-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.high-contrast .summary-box {
+    background-color: #333;
+    border: 1px solid yellow;
+}
+
+.date-picker {
+    margin: 15px 0;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.date-picker input {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.history-toggle {
+    background-color: #f39c12;
+
+    display: block;
+}
+
+.history-toggle:hover {
+    background-color: #e67e22;
+}
+
+.history-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.history-container.visible {
+    max-height: 100%;
+    padding: 20px;
+}
+
+.history-log-summary {
+    background-color: #42acaa;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 5px;
+
+}
+
+.high-contrast .history-container {
+    background-color: #222;
+}
+
+.activity-group {
+    margin-bottom: 10px;
+}
+
+.activity-details {
+    margin-left: 20px;
+}
+
+.detailed-log {
+    background-color: #a2c9a6;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+@media (max-width: 840px) {
+    body {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    button {
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .summary-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
