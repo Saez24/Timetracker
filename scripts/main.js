@@ -7,6 +7,9 @@ const dateSelector = document.getElementById('dateSelector');
 let currentActivity = null;
 let startTime = null;
 let db;
+let timerInterval = null;
+let totalSeconds = 0;
+let isTimerRunning = false;
 
 workBtn.addEventListener('click', toggleWork);
 pauseBtn.addEventListener('click', togglePause);
@@ -20,15 +23,35 @@ dateSelector.addEventListener('change', async () => {
     await updateLogDisplay();
 });
 
+// In initApp():
 const initApp = async () => {
     try {
         await initDB();
-        updateLogDisplay();
+        await updateLogDisplay();
+
+        const entries = await loadEntries();
+        const today = new Date().toLocaleDateString();
+        const todayWorkEntries = entries.filter(entry =>
+            entry.type === 'work' &&
+            new Date(entry.start).toLocaleDateString() === today
+        );
+
+        totalSeconds = todayWorkEntries.reduce((sum, entry) => sum + entry.duration, 0);
+
+        // Timer immer anzeigen
+        createTimerElement();
+        updateTimerDisplay();
+
+        // Wenn Arbeit aktiv war, Timer fortsetzen
+        const lastEntry = entries[entries.length - 1];
+        if (lastEntry?.type === 'work' && !lastEntry.end) {
+            currentActivity = 'work';
+            startTime = new Date(lastEntry.start);
+            startTimer(totalSeconds + Math.floor((new Date() - startTime) / 1000));
+        }
     } catch (error) {
         console.error("Initialisierungsfehler:", error);
-        timeLog.innerHTML = "<div class='log-entry'>Fehler beim Laden der Daten</div>";
     }
-
 };
 
 const saveEntry = (entry) => {
@@ -78,30 +101,17 @@ async function toggleWork() {
     if (currentActivity === 'work') {
         await endActivity('work');
         currentActivity = null;
-        workBtn.textContent = 'Arbeit starten';
-        workBtn.classList.remove('active');
-        pauseBtn.disabled = true;
-        addLogEntry('Arbeit beendet', new Date());
+        pauseTimer();
     } else {
         if (currentActivity === 'pause') {
             await endActivity('pause');
-            addLogEntry('Pause beendet', new Date());
         }
 
         currentActivity = 'work';
         startTime = new Date();
-        workBtn.textContent = 'Arbeit beenden';
-        workBtn.classList.add('active');
-        pauseBtn.disabled = false;
-        pauseBtn.textContent = 'Pause starten';
-
-        const entries = await loadEntries();
-        if (entries.length > 0 && entries[entries.length - 1].type === 'work') {
-            addLogEntry('Arbeit fortgesetzt', startTime);
-        } else {
-            addLogEntry('Arbeit gestartet', startTime);
-        }
+        startTimer(totalSeconds);
     }
+    updateUI();
 }
 
 async function togglePause() {
@@ -109,21 +119,42 @@ async function togglePause() {
         await endActivity('pause');
         currentActivity = 'work';
         startTime = new Date();
-        pauseBtn.textContent = 'Pause starten';
-        pauseBtn.classList.remove('active');
-        workBtn.textContent = 'Arbeit beenden';
-        addLogEntry('Pause beendet', new Date());
-        addLogEntry('Arbeit fortgesetzt', startTime);
+        startTimer(totalSeconds);
     } else if (currentActivity === 'work') {
         await endActivity('work');
         currentActivity = 'pause';
         startTime = new Date();
+        pauseTimer();
+    }
+    updateUI();
+}
+
+function updateUI() {
+    // Arbeit-Button Logik
+    if (currentActivity === 'work') {
+        workBtn.textContent = 'Arbeit beenden';
+        workBtn.classList.add('active');
+        pauseBtn.disabled = false;
+        pauseBtn.textContent = 'Pause starten';
+        pauseBtn.classList.remove('active');
+    }
+    else if (currentActivity === 'pause') {
+        workBtn.textContent = 'Arbeit fortsetzen';
+        workBtn.classList.remove('active');
         pauseBtn.textContent = 'Pause beenden';
         pauseBtn.classList.add('active');
-        workBtn.textContent = 'Arbeit fortsetzen';
-        addLogEntry('Pause gestartet', startTime);
     }
+    else {
+        workBtn.textContent = 'Arbeit starten';
+        workBtn.classList.remove('active');
+        pauseBtn.disabled = true;
+        pauseBtn.textContent = 'Pause starten';
+        pauseBtn.classList.remove('active');
+    }
+
+    updateTimerDisplay();
 }
+
 
 async function endActivity(activityType) {
     const endTime = new Date();
@@ -271,6 +302,9 @@ async function updateLogDisplay() {
         const timeSummary = calculateTimeSummary(todayEntries);
 
         timeLog.innerHTML = createSummaryView(todayString, timeSummary);
+
+        createTimerElement();
+        updateTimerDisplay();
         const downloadBtn = document.getElementById('downloadBtn');
         downloadBtn.addEventListener('click', downloadCSV);
         const detailedLog = document.getElementById('detailedLog');
@@ -285,4 +319,62 @@ async function updateLogDisplay() {
 }
 
 
+// Timer-Element erstellen (wird nur einmal aufgerufen)
+function createTimerElement() {
+    let timerElement = document.getElementById('activeTimer');
+    if (!timerElement) {
+        timerElement = document.createElement('div');
+        timerElement.id = 'activeTimer';
+        timerElement.className = 'active-timer';
+        timerElement.innerHTML = `
+            <div class="timer-label">Status:</div>
+            <div class="timer-display">${formatTime(totalSeconds)}</div>
+        `;
+        document.querySelector('.log-summary').prepend(timerElement);
+    }
+}
+
+
+function startTimer(resumeTime = 0) {
+    if (isTimerRunning) return;
+
+    totalSeconds = resumeTime;
+    updateTimerDisplay();
+    isTimerRunning = true;
+
+    timerInterval = setInterval(() => {
+        totalSeconds++;
+        updateTimerDisplay();
+    }, 1000);
+}
+
+// Timer anhalten
+function pauseTimer() {
+    if (!isTimerRunning) return;
+
+    clearInterval(timerInterval);
+    isTimerRunning = false;
+
+    updateTimerDisplay();
+}
+
+// Timer aktualisieren
+function updateTimerDisplay() {
+    const timerElement = document.getElementById('activeTimer');
+    const timerDisplay = document.querySelector('.timer-display');
+
+    if (timerElement && timerDisplay) {
+        timerElement.style.display = 'flex'; // Immer sichtbar!
+        timerDisplay.textContent = formatTime(totalSeconds);
+
+        // Optional: Label anpassen (z. B. "Pause aktiv" / "Arbeit aktiv")
+        const timerLabel = document.querySelector('.timer-label');
+        if (timerLabel) {
+            timerLabel.textContent =
+                currentActivity === 'work' ? 'Aktive Arbeitszeit:' :
+                    currentActivity === 'pause' ? 'Pause (Zeit pausiert):' :
+                        'Gesamte Arbeitszeit heute:';
+        }
+    }
+}
 
